@@ -109,12 +109,22 @@ module.exports = {
             #swagger.summary = "Delete Course"
         */
 
-        const data = await Course.deleteOne({ _id: req.params.id })
+            const data = await Course.deleteOne({ _id: req.params.id });
 
-        res.status(data.deletedCount ? 204 : 404).send({
-            error: !data.deletedCount,
-            data
-        })
+            if (data.deletedCount) {
+                res.status(200).send({
+                    error: false,
+                    message: 'Course deleted successfully.',
+                    data
+                });
+            } 
+            else {
+                res.status(404).send({
+                    error: true,
+                    message: 'Course not found.',
+                    data
+                });
+            }
 
     },
 

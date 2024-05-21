@@ -164,7 +164,8 @@ module.exports = {
     
             res.status(data.deletedCount ? 204 : 404).send({
                 error: !data.deletedCount,
-                data
+                data,
+                message: data.deletedCount ? 'User deleted successfully.' : 'User not found.',
             })
 
         } else {

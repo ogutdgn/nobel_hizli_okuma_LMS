@@ -11,7 +11,7 @@ import Dashboard from "../pages/Dashboard";
 // import Products from "../pages/Products";
 import HomePage from "../pages/HomePage";
 import Students from "../pages/Students";
-import Tasks from "../pages/Tasks";
+import Assignments from "../pages/Assignments";
 import Exercises from "../pages/Exercises";
 import Courses from "../pages/Courses";
 import Profile from "../pages/Profile";
@@ -28,7 +28,7 @@ const AppRouter = () => {
           <Route path="" element={<Dashboard role="admin" />}>
             <Route index element={<HomePage />} />
             <Route path="ogrenciler" element={<Students />} />
-            <Route path="odevler" element={<Tasks />} />
+            <Route path="odevler" element={<Assignments />} />
             <Route path="egzersizler" element={<Exercises />} />
             <Route path="kurslar" element={<Courses />} />
             <Route path="profil" element={<Profile />} />
@@ -38,7 +38,7 @@ const AppRouter = () => {
           <Route path="" element={<Dashboard role="user" />}>
             <Route index element={<HomePage />} />
             <Route path="ilerlemeler" element={<Progress />} />
-            <Route path="odevler" element={<Tasks />} />
+            <Route path="odevler" element={<Assignments />} />
             <Route path="egzersizler" element={<Exercises />} />
             <Route path="kurslar" element={<Courses />} />
             <Route path="profil" element={<Profile />} />
