@@ -1,4 +1,4 @@
-"use strict";
+"use strict"
 /* -------------------------------------------------------
     NODEJS EXPRESS | CLARUSWAY FullStack Team
 ------------------------------------------------------- */
@@ -7,63 +7,50 @@
 const Assignment = require('../models/assignment');
 
 module.exports = {
+
     list: async (req, res) => {
         /*
             #swagger.tags = ["Assignments"]
             #swagger.summary = "List Assignments"
+            #swagger.description = `
+                You can use <u>filter[] & search[] & sort[] & page & limit</u> queries with endpoint.
+                <ul> Examples:
+                    <li>URL/?<b>filter[field1]=value1&filter[field2]=value2</b></li>
+                    <li>URL/?<b>search[field1]=value1&search[field2]=value2</b></li>
+                    <li>URL/?<b>sort[field1]=asc&sort[field2]=desc</b></li>
+                    <li>URL/?<b>limit=10&page=1</b></li>
+                </ul>
+            `
         */
 
-        try {
-            let filter = {};
+        const data = await res.getModelList(Assignment)
 
-            if (!req.user.isAdmin) {
-                // Eğer kullanıcı admin değilse sadece kendi ödevlerini görür
-                filter.studentId = req.user._id;
-            }
-
-            console.log("Fetching assignments with filter:", filter);
-
-            const data = await Assignment.find(filter)
-                .populate({ path: 'studentId', select: 'username email' })
-                .populate({ path: 'teacherId', select: 'username email' });
-
-            console.log("Assignments fetched successfully:", data);
-
-            res.status(200).send({
-                error: false,
-                data
-            });
-        } catch (error) {
-            console.error("Error fetching assignments:", error);
-            res.status(500).send({
-                error: true,
-                message: "Failed to fetch assignments.",
-                details: error.message,
-            });
-        }
+        res.status(200).send({
+            error: false,
+            details: await res.getModelListDetails(Assignment),
+            data
+        })
     },
 
     create: async (req, res) => {
         /*
             #swagger.tags = ["Assignments"]
             #swagger.summary = "Create Assignment"
+            #swagger.parameters['body'] = {
+                in: 'body',
+                required: true,
+                schema: {
+                    "name": "Assignment 1"
+                }
+            }
         */
 
-        try {
-            const data = await Assignment.create(req.body);
+        const data = await Assignment.create(req.body)
 
-            res.status(201).send({
-                error: false,
-                data
-            });
-        } catch (error) {
-            console.error("Error creating assignment:", error);
-            res.status(500).send({
-                error: true,
-                message: "Failed to create assignment.",
-                details: error.message,
-            });
-        }
+        res.status(201).send({
+            error: false,
+            data
+        })
     },
 
     read: async (req, res) => {
@@ -72,51 +59,48 @@ module.exports = {
             #swagger.summary = "Get Single Assignment"
         */
 
-        try {
-            console.log("Fetching assignment with ID:", req.params.id);
-
+        if (req.params?.id) {
+        // Single:
             const data = await Assignment.findOne({ _id: req.params.id })
-                .populate({ path: 'studentId', select: 'username email' })
-                .populate({ path: 'teacherId', select: 'username email' });
 
             res.status(200).send({
                 error: false,
                 data
-            });
-        } catch (error) {
-            console.error("Error fetching assignment:", error);
-            res.status(500).send({
-                error: true,
-                message: "Failed to fetch assignment.",
-                details: error.message,
-            });
+            })
+
+        } else {
+        // All:
+            const data = await res.getModelList(Assignment)
+
+            res.status(200).send({
+                error: false,
+                details: await res.getModelListDetails(Assignment),
+                data
+            })
         }
+
     },
 
     update: async (req, res) => {
         /*
             #swagger.tags = ["Assignments"]
             #swagger.summary = "Update Assignment"
+            #swagger.parameters['body'] = {
+                in: 'body',
+                required: true,
+                schema: {
+                    "name": "Assignment 1"
+                }
+            }
         */
 
-        try {
-            console.log("Updating assignment with ID:", req.params.id);
+        const data = await Assignment.updateOne({ _id: req.params.id }, req.body, { runValidators: true })
 
-            const data = await Assignment.updateOne({ _id: req.params.id }, req.body, { runValidators: true });
-
-            res.status(202).send({
-                error: false,
-                data,
-                new: await Assignment.findOne({ _id: req.params.id })
-            });
-        } catch (error) {
-            console.error("Error updating assignment:", error);
-            res.status(500).send({
-                error: true,
-                message: "Failed to update assignment.",
-                details: error.message,
-            });
-        }
+        res.status(202).send({
+            error: false,
+            data,
+            new: await Assignment.findOne({ _id: req.params.id })
+        })
     },
 
     delete: async (req, res) => {
@@ -125,23 +109,13 @@ module.exports = {
             #swagger.summary = "Delete Assignment"
         */
 
-        try {
-            console.log("Deleting assignment with ID:", req.params.id);
+        const data = await Assignment.deleteOne({ _id: req.params.id })
 
-            const data = await Assignment.deleteOne({ _id: req.params.id });
+        res.status(data.deletedCount ? 204 : 404).send({
+            error: !data.deletedCount,
+            data
+        })
 
-            res.status(data.deletedCount ? 204 : 404).send({
-                error: !data.deletedCount,
-                message: data.deletedCount ? "Assignment deleted successfully." : "Assignment not found.",
-                data
-            });
-        } catch (error) {
-            console.error("Error deleting assignment:", error);
-            res.status(500).send({
-                error: true,
-                message: "Failed to delete assignment.",
-                details: error.message,
-            });
-        }
     },
-};
+
+}

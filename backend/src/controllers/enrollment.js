@@ -48,13 +48,27 @@ module.exports = {
                 }
             }
         */
+        if (await Enrollment.findOne({ studentId: req.body.studentId, courseId: req.body.courseId })) {
+            res.status(404).send({
+                error: true,
+                message: "Zaten bu kursa kayıtlısınız.",
+                
+            })
+        } else {
+            const data = await Enrollment.create(req.body)
 
-        const data = await Enrollment.create(req.body)
+            res.status(201).send({
+                error: false,
+                data
+            })
+        }
 
-        res.status(201).send({
-            error: false,
-            data
-        })
+        // const data = await Enrollment.create(req.body)
+
+        // res.status(201).send({
+        //     error: false,
+        //     data
+        // })
     },
 
     read: async (req, res) => {

@@ -129,25 +129,28 @@ module.exports = {
                 }
             }
         */
-
-        // Sadece kendi kaydını güncelleyebilir:
-        const customFilters = req.user?.isAdmin ? { _id: req.params.id } : { _id: req.user._id }
-
-        // Yeni kayıtlarda admin/staff durumunu değiştiremez:
-        if (!req.user?.isAdmin) {
-            delete req.body.isActive
-            delete req.body.isTeacher
-            delete req.body.isAdmin
+    
+        try {
+            // Sadece kendi kaydını güncelleyebilir:
+            const customFilters = req.user?.isAdmin ? { _id: req.params.id } : { _id: req.user._id };
+    
+            // Yeni kayıtlarda admin/staff durumunu değiştiremez:
+            if (!req.user?.isAdmin) {
+                delete req.body.isActive;
+                delete req.body.isTeacher;
+                delete req.body.isAdmin;
+            }
+    
+            const data = await User.updateOne(customFilters, req.body, { runValidators: true });
+    
+            res.status(202).send({
+                error: false,
+                data,
+                new: await User.findOne(customFilters),
+            });
+        } catch (error) {
+            res.status(500).send({ error: true, message: error.message });
         }
-        
-        const data = await User.updateOne(customFilters, req.body, { runValidators: true })
-
-        res.status(202).send({
-            error: false,
-            data,
-            new: await User.findOne(customFilters),
-        })
-
     },
 
     delete: async (req, res) => {
@@ -173,6 +176,8 @@ module.exports = {
             res.errorStatusCode = 403
             throw new Error('You can not remove your account.')
         }
-    },
-
+    }
 }
+
+
+

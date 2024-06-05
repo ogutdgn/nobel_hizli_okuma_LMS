@@ -1,24 +1,23 @@
 import { useDispatch } from "react-redux";
-import { fetchStart, fetchSuccess, fetchFail, addAssignment, updateAssignment, deleteAssignment, setDeletingId } from "../features/assignmentSlice";
 import useAxios from "./useAxios";
+import { fetchStart, fetchSuccess, fetchFail, addAssignment, updateAssignment, deleteAssignment, setDeletingId } from "../features/assignmentSlice";
 import { toastErrorNotify, toastSuccessNotify } from "../helper/ToastNotify";
 
 const useAssignmentCalls = () => {
-    const dispatch = useDispatch();
-    const { axiosWithToken } = useAxios();
-  
-    const getAssignments = async () => {
-      dispatch(fetchStart());
-      try {
-        const { data } = await axiosWithToken.get("/assignments/");
-        console.log("Assignments fetched:", data); // Log assignments
-        dispatch(fetchSuccess(data.data));
-      } catch (error) {
-        console.error("Error fetching assignments:", error.response?.data || error.message);
-        dispatch(fetchFail());
-        toastErrorNotify("Assignments could not be fetched.");
-      }
-    };
+  const dispatch = useDispatch();
+  const { axiosWithToken } = useAxios();
+
+  const getAssignments = async () => {
+    dispatch(fetchStart());
+    try {
+      const { data } = await axiosWithToken.get("/assignments/");
+      dispatch(fetchSuccess(data.data));
+    } catch (error) {
+      console.error("Error fetching assignments:", error.response?.data || error.message);
+      dispatch(fetchFail());
+      toastErrorNotify("Assignments could not be fetched.");
+    }
+  };
 
   const postAssignment = async (assignmentInfo) => {
     dispatch(fetchStart());
@@ -50,30 +49,38 @@ const useAssignmentCalls = () => {
     dispatch(fetchStart());
     dispatch(setDeletingId(assignmentId));
     try {
-        console.log("Deleting assignment with ID:", assignmentId);
-        const response = await axiosWithToken.delete(`/assignments/${assignmentId}/`);
-        if (response.status === 204) {
-            console.log("Assignment deleted successfully:", assignmentId);
-            dispatch(deleteAssignment(assignmentId));
-            toastSuccessNotify(response.data?.message || "Assignment deleted successfully.");
-        } else {
-            console.log("Failed to delete assignment, status code:", response.status);
-            throw new Error(response.data?.message || "Assignment could not be deleted.");
-        }
+      const response = await axiosWithToken.delete(`/assignments/${assignmentId}/`);
+      if (response.status === 204) {
+        dispatch(deleteAssignment(assignmentId));
+        toastSuccessNotify(response.data?.message || "Assignment deleted successfully.");
+      } else {
+        throw new Error(response.data?.message || "Assignment could not be deleted.");
+      }
     } catch (error) {
-        console.log("Error response:", error.response?.data || error.message);
-        dispatch(fetchFail());
-        if (error.response && error.response.status === 404) {
-            toastErrorNotify("Assignment not found.");
-        } else {
-            toastErrorNotify(error.message || "Assignment could not be deleted.");
-        }
+      console.error("Error deleting assignment:", error.response?.data || error.message);
+      dispatch(fetchFail());
+      if (error.response && error.response.status === 404) {
+        toastErrorNotify("Assignment not found.");
+      } else {
+        toastErrorNotify(error.message || "Assignment could not be deleted.");
+      }
     } finally {
       dispatch(setDeletingId(null));
     }
   };
 
-  return { getAssignments, postAssignment, putAssignment, removeAssignment };
+  const getAssignmentsByStudent = async (studentId) => {
+    try {
+      const { data } = await axiosWithToken.get(`/assignments?filter[studentId]=${studentId}`);
+      return data.data;
+    } catch (error) {
+      console.error("Error fetching assignments:", error.response?.data || error.message);
+      toastErrorNotify("Assignments could not be fetched.");
+      return [];
+    }
+  };
+
+  return { getAssignments, postAssignment, putAssignment, removeAssignment, getAssignmentsByStudent };
 };
 
 export default useAssignmentCalls;

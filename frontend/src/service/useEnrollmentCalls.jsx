@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
-import { fetchStart, fetchSuccess, fetchFail, addEnrollment, updateEnrollment, deleteEnrollment, setDeletingId } from "../features/enrollmentSlice";
 import useAxios from "./useAxios";
+import { fetchStart, fetchSuccess, fetchFail, addEnrollment, updateEnrollment, deleteEnrollment } from "../features/enrollmentSlice";
 import { toastErrorNotify, toastSuccessNotify } from "../helper/ToastNotify";
 
 const useEnrollmentCalls = () => {
@@ -13,6 +13,7 @@ const useEnrollmentCalls = () => {
       const { data } = await axiosWithToken.get("/enrollments/");
       dispatch(fetchSuccess(data.data));
     } catch (error) {
+      console.error("Error fetching enrollments:", error.response?.data || error.message);
       dispatch(fetchFail());
       toastErrorNotify("Enrollments could not be fetched.");
     }
@@ -25,6 +26,7 @@ const useEnrollmentCalls = () => {
       dispatch(addEnrollment(data.data));
       toastSuccessNotify("Enrollment added successfully.");
     } catch (error) {
+      console.error("Error creating enrollment:", error.response?.data || error.message);
       dispatch(fetchFail());
       toastErrorNotify("Enrollment could not be added.");
     }
@@ -37,6 +39,7 @@ const useEnrollmentCalls = () => {
       dispatch(updateEnrollment(data.data));
       toastSuccessNotify("Enrollment updated successfully.");
     } catch (error) {
+      console.error("Error updating enrollment:", error.response?.data || error.message);
       dispatch(fetchFail());
       toastErrorNotify("Enrollment could not be updated.");
     }
@@ -44,32 +47,37 @@ const useEnrollmentCalls = () => {
 
   const removeEnrollment = (enrollmentId) => async (dispatch) => {
     dispatch(fetchStart());
-    dispatch(setDeletingId(enrollmentId));
     try {
-        console.log("Deleting enrollment with ID:", enrollmentId);
-        const response = await axiosWithToken.delete(`/enrollments/${enrollmentId}/`);
-        if (response.status === 200) {
-            console.log("Enrollment deleted successfully:", enrollmentId);
-            dispatch(deleteEnrollment(enrollmentId));
-            toastSuccessNotify(response.data.message || "Enrollment deleted successfully.");
-        } else {
-            console.log("Failed to delete enrollment, status code:", response.status);
-            throw new Error(response.data.message || "Enrollment could not be deleted.");
-        }
+      const response = await axiosWithToken.delete(`/enrollments/${enrollmentId}/`);
+      if (response.status === 204) {
+        dispatch(deleteEnrollment(enrollmentId));
+        toastSuccessNotify(response.data?.message || "Enrollment deleted successfully.");
+      } else {
+        throw new Error(response.data?.message || "Enrollment could not be deleted.");
+      }
     } catch (error) {
-        console.log("Error response:", error.response);
-        dispatch(fetchFail());
-        if (error.response && error.response.status === 404) {
-            toastErrorNotify("Enrollment not found.");
-        } else {
-            toastErrorNotify(error.message || "Enrollment could not be deleted.");
-        }
-    } finally {
-      dispatch(setDeletingId(null));
+      console.error("Error deleting enrollment:", error.response?.data || error.message);
+      dispatch(fetchFail());
+      if (error.response && error.response.status === 404) {
+        toastErrorNotify("Enrollment not found.");
+      } else {
+        toastErrorNotify(error.message || "Enrollment could not be deleted.");
+      }
     }
   };
 
-  return { getEnrollments, postEnrollment, putEnrollment, removeEnrollment };
+  const getEnrollmentsByStudent = async (studentId) => {
+    try {
+      const { data } = await axiosWithToken.get(`/enrollments?filter[studentId]=${studentId}`);
+      return data.data;
+    } catch (error) {
+      console.error("Error fetching enrollments:", error.response?.data || error.message);
+      toastErrorNotify("Enrollments could not be fetched.");
+      return [];
+    }
+  };
+
+  return { getEnrollments, postEnrollment, putEnrollment, removeEnrollment, getEnrollmentsByStudent };
 };
 
 export default useEnrollmentCalls;
