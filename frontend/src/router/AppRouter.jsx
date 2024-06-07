@@ -12,9 +12,9 @@ import Profile from "../pages/Profile";
 import Progress from "../pages/Progress";
 import DotEyeExercise from "../pages/ExercisesPage/Exercises/13-dot-eye/DotEyeExercise";
 // import exercisesData from "../pages/ExercisesPage/exercisesData";
-import VerticalOpening from "../pages/ExercisesPage/Exercises/vertical-opening/VerticalOpening";
 import GrowingObjects from "../pages/ExercisesPage/Exercises/growing-hexagon/GrowingObjects";
 import SimilarWords from "../pages/ExercisesPage/Exercises/similar-words/SmilarWords";
+import OpeningObjects from "../pages/ExercisesPage/Exercises/opening-objects/OpeningObjects";
 
 const renderExerciseRoutes = (basePath) => {
   return [
@@ -25,11 +25,11 @@ const renderExerciseRoutes = (basePath) => {
         element={<DotEyeExercise />}
       />
 
-      {/* <Route
+      <Route
         key="vertical-opening"
-        path={`${basePath}/vertical-opening`}
-        element={<VerticalOpening />}
-      /> */}
+        path={`${basePath}/acilan-nesneler`}
+        element={<OpeningObjects />}
+      />
 
       <Route
         key="growing-objects"

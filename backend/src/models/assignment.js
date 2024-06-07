@@ -17,6 +17,7 @@ const AssignmentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,  
         required: true,
         ref: "User",
+        default: "65343222b67e9681f937f001",
     },
     
     taskContent: {

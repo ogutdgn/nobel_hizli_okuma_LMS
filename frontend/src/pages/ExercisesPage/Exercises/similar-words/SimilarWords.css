@@ -6,14 +6,16 @@
     height: 400px;
   }
   
-  .word {
-    font-size: 24px;
-    margin: 5px 0;
+  .image-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* margin: 10px 0; */
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
   }
   
-  .word.visible {
+  .image-box.visible {
     opacity: 1;
   }
   

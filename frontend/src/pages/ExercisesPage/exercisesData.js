@@ -3,8 +3,7 @@
 const exercisesData = {
   fastReadingExercises: [
     { name: "13 Nokta Göz Egzersizi", new: false, url: "13-nokta-egzersizi"  },
-    // { name: "Açılan Nesneler: Dikey", new: false, url: "vertical-opening" },
-    // { name: "Açılan Nesneler: Yatay", new: false, url: "horizontal-opening" },
+    { name: "Açılan Nesneler", new: false, url: "acilan-nesneler" },
     { name: "Benzer Kelimeler", new: false, url: "benzer-kelimeler" },
     { name: "Büyüyen Şekiller", new: false, url: "buyuyen-sekiller" },
     // { name: "Dairesel Göz Egzersizi", new: false, url: "circular-eye" },

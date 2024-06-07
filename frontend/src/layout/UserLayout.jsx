@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from 'react';
 import { Box, CssBaseline, Toolbar, Typography, Button } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
